@@ -3,6 +3,7 @@
 namespace Tests\Unit\Command;
 
 use Http;
+use Queue;
 use Tests\TestCase;
 
 class FakePostTest extends TestCase
@@ -13,6 +14,8 @@ class FakePostTest extends TestCase
 
     public function test_the_request_failed_500()
     {
+        Queue::fake();
+
         Http::fake([
             'atomic.incfile.com/fakepost' => Http::response(['message' => ""], 500)
         ]);
@@ -28,6 +31,8 @@ class FakePostTest extends TestCase
 
     public function test_the_request_failed_418()
     {
+        Queue::fake();
+
         Http::fake([
             'atomic.incfile.com/fakepost' => Http::response(['message' => "I'm a teapot"], 418)
         ]);

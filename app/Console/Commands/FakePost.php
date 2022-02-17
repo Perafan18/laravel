@@ -6,6 +6,7 @@ use GuzzleHttp\Promise\PromiseInterface;
 use Http;
 use Illuminate\Console\Command;
 use Illuminate\Http\Client\Response;
+use App\Jobs\FakePost as FakePostJob;
 
 class FakePost extends Command
 {
@@ -45,6 +46,7 @@ class FakePost extends Command
         $this->onError($response);
 
         if($response->failed()) {
+            $this->retry();
             return 1;
         }
 
@@ -91,4 +93,23 @@ class FakePost extends Command
         return Http::acceptJson()
             ->post(config('app.fake_url'));
     }
+    /**
+     * @return void
+     */
+
+    private function retry()
+    {
+        FakePostJob::dispatch()
+            ->delay($this->delay());
+    }
+
+    /**
+     * @return \Illuminate\Support\Carbon
+     */
+
+    private function delay(): \Illuminate\Support\Carbon
+    {
+        return now()->addMinutes(10);
+    }
+
 }
